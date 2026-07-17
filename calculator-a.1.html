@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Calculator A.1</title>
+
+<style>
+:root {
+    --bg: #f2f2f2;
+    --box: white;
+    --text: #111;
+    --button: #e5e5e5;
+    --operator: #ff9500;
+}
+
+.dark {
+    --bg: #121212;
+    --box: #1e1e1e;
+    --text: white;
+    --button: #333;
+    --operator: #ff9500;
+}
+
+* {
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.calculator {
+    width: 360px;
+    background: var(--box);
+    padding: 20px;
+    border-radius: 20px;
+}
+
+.top {
+    display:flex;
+    justify-content:space-between;
+    margin-bottom:10px;
+}
+
+button {
+    border:none;
+    padding:15px;
+    border-radius:10px;
+    cursor:pointer;
+    background:var(--button);
+    color:var(--text);
+    font-size:18px;
+}
+
+.display {
+    height:80px;
+    background:#000;
+    color:white;
+    font-size:35px;
+    padding:15px;
+    text-align:left;
+    border-radius:10px;
+    overflow:hidden;
+}
+
+.buttons {
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:10px;
+    margin-top:15px;
+}
+
+.operator {
+    background:var(--operator);
+    color:white;
+}
+
+.equal {
+    grid-column:span 2;
+    background:#34c759;
+    color:white;
+}
+
+.scientific {
+    display:none;
+    margin-top:15px;
+}
+
+.scientific.show {
+    display:grid;
+}
+
+.history {
+    margin-top:15px;
+    max-height:100px;
+    overflow:auto;
+    font-size:14px;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="calculator">
+
+<div class="top">
+<button onclick="toggleTheme()">🌙</button>
+<button onclick="toggleScientific()">MODE</button>
+</div>
+
+<div id="display" class="display">0</div>
+
+
+<div class="scientific buttons" id="scientific">
+
+<button onclick="add('sin(')">sin</button>
+<button onclick="add('cos(')">cos</button>
+<button onclick="add('tan(')">tan</button>
+<button onclick="add('sqrt(')">√</button>
+
+<button onclick="add('Math.PI')">π</button>
+<button onclick="add('Math.E')">e</button>
+<button onclick="add('log(')">ln</button>
+<button onclick="square()">x²</button>
+
+<button onclick="add('(')">(</button>
+<button onclick="add(')')">)</button>
+<button onclick="power()">xʸ</button>
+<button onclick="factorial()">!</button>
+
+</div>
+
+
+<div class="buttons">
+
+<button onclick="clearDisplay()">AC</button>
+<button onclick="backspace()">⌫</button>
+<button onclick="add('%')">%</button>
+<button class="operator" onclick="add('/')">÷</button>
+
+
+<button onclick="add('7')">7</button>
+<button onclick="add('8')">8</button>
+<button onclick="add('9')">9</button>
+<button class="operator" onclick="add('*')">×</button>
+
+
+<button onclick="add('4')">4</button>
+<button onclick="add('5')">5</button>
+<button onclick="add('6')">6</button>
+<button class="operator" onclick="add('-')">−</button>
+
+
+<button onclick="add('1')">1</button>
+<button onclick="add('2')">2</button>
+<button onclick="add('3')">3</button>
+<button class="operator" onclick="add('+')">+</button>
+
+
+<button onclick="add('0')">0</button>
+<button onclick="add('.')">.</button>
+<button class="equal" onclick="calculate()">=</button>
+
+</div>
+
+
+<div>
+<h4>History</h4>
+<div id="history" class="history"></div>
+</div>
+
+
+</div>
+
+
+<script>
+
+let display = document.getElementById("display");
+let historyBox = document.getElementById("history");
+
+let expression="";
+
+
+function add(value){
+    expression += value;
+    display.innerText = expression;
+}
+
+
+function clearDisplay(){
+    expression="";
+    display.innerText="0";
+}
+
+
+function backspace(){
+    expression = expression.slice(0,-1);
+    display.innerText = expression || "0";
+}
+
+
+function calculate(){
+
+try{
+
+let result = eval(
+expression
+.replace(/sin\(/g,"Math.sin(Math.PI/180*")
+.replace(/cos\(/g,"Math.cos(Math.PI/180*")
+.replace(/tan\(/g,"Math.tan(Math.PI/180*")
+.replace(/sqrt\(/g,"Math.sqrt(")
+.replace(/log\(/g,"Math.log(")
+);
+
+
+display.innerText=result;
+
+historyBox.innerHTML +=
+`<div>${expression} = ${result}</div>`;
+
+expression=result.toString();
+
+}
+
+catch{
+display.innerText="Error";
+expression="";
+}
+
+}
+// تغییر حالت علمی
+function toggleScientific(){
+    document
+    .getElementById("scientific")
+    .classList
+    .toggle("show");
+}
+
+
+// تغییر تم
+function toggleTheme(){
+
+    document.body.classList.toggle("dark");
+
+    if(document.body.classList.contains("dark")){
+        sessionStorage.setItem("theme","dark");
+    }
+    else{
+        sessionStorage.setItem("theme","light");
+    }
+
+}
+
+
+// بارگذاری تم
+if(sessionStorage.getItem("theme") === "dark"){
+    document.body.classList.add("dark");
+}
+
+
+
+// توان x²
+function square(){
+
+    if(expression){
+        expression = `(${expression})**2`;
+        display.innerText = expression;
+    }
+
+}
+
+
+
+// توان xʸ
+function power(){
+
+    expression += "**";
+    display.innerText = expression;
+
+}
+
+
+
+// فاکتوریل
+function factorial(){
+
+    try{
+
+        let num = Number(expression);
+
+        if(num < 0 || !Number.isInteger(num)){
+            throw Error();
+        }
+
+        let result = 1;
+
+        for(let i=1;i<=num;i++){
+            result *= i;
+        }
+
+        expression=result.toString();
+        display.innerText=result;
+
+    }
+
+    catch{
+        display.innerText="Error";
+        expression="";
+    }
+
+}
+
+
+
+// پشتیبانی کیبورد
+
+document.addEventListener("keydown", function(e){
+
+    let key=e.key;
+
+
+    if(
+        "0123456789+-*/.%()".includes(key)
+    ){
+
+        add(key);
+
+    }
+
+
+    else if(key==="Enter"){
+
+        calculate();
+
+    }
+
+
+    else if(key==="Backspace"){
+
+        backspace();
+
+    }
+
+
+    else if(key==="Escape"){
+
+        clearDisplay();
+
+    }
+
+});
+
+
+
+// تاریخچه فقط در همین باز بودن صفحه است
+window.addEventListener(
+"beforeunload",
+function(){
+
+    sessionStorage.removeItem("history");
+
+});
+</script>
+</body>
+</html>
