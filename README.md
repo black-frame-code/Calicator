@@ -61,9 +61,8 @@ No installation required.
 ```
 Calculator-A1/
 │
-├── index.html
-├── style.css
-├── script.js
+├── calculator-a.1.html
+├── calculator_1.apk
 └── README.md
 ```
 
